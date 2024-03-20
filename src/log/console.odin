@@ -110,7 +110,7 @@ inputBar :: proc(console: ^Console) {
         if console.buffer != {} {
             //fmt.println((string)(console.buffer[:]))
             print_console((string)(console.buffer[:]))
-            temp := cstring(raw_data(console.buffer[:]))
+            temp := strings.clone_to_cstring(strings.trim_right_null(cast(string)console.buffer[:])) or_else panic("Console temp buf error fuuuckk")
             append(&console.items, temp)
             console.scrollToBottom = true
         }

@@ -25,17 +25,12 @@ trace :: proc(args: ..any) {
 
     fmt.printf("[%d:%d:%d][TRACE] %s\n", hour, min, sec, str)
     
-    str_log := fmt.sbprintf(&builder, "[%d:%d:%d][TRACE] %s\n", hour, min, sec, str)
-    
-    //cstring(raw_data(console.buffer[:]))
+    //str_log := fmt.sbprintf(&builder, "[%d:%d:%d][TRACE] %s\n", hour, min, sec, str)
     
     strings.builder_reset(&builder)
-    /*
-    str_bytes := transmute([]u8)str_log
-    item := LogItem{
-        str_bytes, .Trace,
-    }
-    append(&console.items, item) */
+
+    temp := strings.clone_to_cstring(strings.trim_right_null(cast(string)str)) or_else panic("Console temp buf error fuuuckk")
+    append(&console.items, temp)
 }
 
 error :: proc(args: ..any) {
