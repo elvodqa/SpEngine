@@ -19,7 +19,7 @@ FBO : u32
 RBO : u32
 TEXTURE_SCREEN : u32
 
-clearColor : [3]f32
+clearColor : [3]f32 = {203.0/255.0, 105.0/255.0, 50.0/255.0}
 
 
 main :: proc() {
@@ -94,8 +94,6 @@ main :: proc() {
 
     create_framebuffer()
 
-
-
     for !glfw.WindowShouldClose(global.window_main) {
         glfw.PollEvents()
         
@@ -147,8 +145,13 @@ main :: proc() {
         }
         im.End()
 
-        if im.Begin("Scene") {
+        if im.Begin("Entities") {
+           
+        }
+        im.End()
 
+        if im.Begin("Properties") {
+          
         }
         im.End()
 
