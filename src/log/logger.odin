@@ -30,6 +30,7 @@ trace :: proc(args: ..any) {
     strings.builder_reset(&builder)
 
     temp := strings.clone_to_cstring(strings.trim_right_null(cast(string)str)) or_else panic("Console temp buf error fuuuckk")
+    
     append(&console.items, temp)
 }
 

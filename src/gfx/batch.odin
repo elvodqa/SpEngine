@@ -6,7 +6,3 @@ import gl "vendor:OpenGL"
 
 
 
-
-
-
-

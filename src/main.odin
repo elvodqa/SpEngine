@@ -7,6 +7,7 @@ import "base:runtime"
 import "vendor:glfw"
 import gl "vendor:OpenGL"
 
+import "global"
 import "log"
 import "gfx"
 import im "../odin-imgui"
@@ -20,9 +21,6 @@ TEXTURE_SCREEN : u32
 
 clearColor : [3]f32
 
-window_main: glfw.WindowHandle
-
-debug_input_buffer: cstring = ""
 
 main :: proc() {
     console := log.make_console()
@@ -49,18 +47,19 @@ main :: proc() {
     glfw.WindowHint(glfw.OPENGL_FORWARD_COMPAT, glfw.TRUE)
     glfw.WindowHint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
-    window_main = glfw.CreateWindow(800, 600, "GuiKit", nil, nil)
-    if (window_main == nil) {
+    global.window_main = glfw.CreateWindow(800, 600, "GuiKit", nil, nil)
+    if (global.window_main == nil) {
         log.error("Error initializing main window")
     } else {
        log.trace("Initialized window");
     }
     
     
-    glfw.MakeContextCurrent(window_main)
+    glfw.MakeContextCurrent(global.window_main)
+
 
     glfw.SetErrorCallback(error_callback)
-    glfw.SetFramebufferSizeCallback(window_main, resize_callback)
+    glfw.SetFramebufferSizeCallback(global.window_main, resize_callback)
 
     when ODIN_OS == .Darwin {
         gl.load_up_to(int(4), 1, glfw.gl_set_proc_address) 
@@ -70,7 +69,7 @@ main :: proc() {
         log.trace("Loaded OpenGL 4.6")
     }
 
-    glfw.MaximizeWindow(window_main)
+    glfw.MaximizeWindow(global.window_main)
 
     // Load imgui_impl_glfw
     im.CHECKVERSION()
@@ -88,7 +87,7 @@ main :: proc() {
 	}
 
     im.StyleColorsDark()
-    imgui_impl_glfw.InitForOpenGL(window_main, true)
+    imgui_impl_glfw.InitForOpenGL(global.window_main, true)
     defer imgui_impl_glfw.Shutdown()
     imgui_impl_opengl3.Init("#version 150")
     defer imgui_impl_opengl3.Shutdown()
@@ -97,7 +96,7 @@ main :: proc() {
 
 
 
-    for !glfw.WindowShouldClose(window_main) {
+    for !glfw.WindowShouldClose(global.window_main) {
         glfw.PollEvents()
         
           
@@ -115,7 +114,7 @@ main :: proc() {
         if im.BeginMainMenuBar() {
             if im.BeginMenu("File") {
                 if im.MenuItem("Exit", "Alt+F4") {
-                    glfw.SetWindowShouldClose(window_main, true)
+                    glfw.SetWindowShouldClose(global.window_main, true)
                 }
                 im.EndMenu()
             }
@@ -141,9 +140,15 @@ main :: proc() {
             im.Text("average %.3f", 1000.0 / io.Framerate)
             im.Text("ms/frame (%.1f FPS)", io.Framerate)
 
-            if im.InputText("Foo", debug_input_buffer, len(debug_input_buffer)) {
+            im.Text("Console size: ")
+            im.SameLine()
+            str := fmt.ctprintf("%v", len(console.items))
+            im.Text(str)
+        }
+        im.End()
 
-            }
+        if im.Begin("Scene") {
+
         }
         im.End()
 
@@ -152,7 +157,7 @@ main :: proc() {
 
         im.Render()
     
-        display_w, display_h := glfw.GetFramebufferSize(window_main)
+        display_w, display_h := glfw.GetFramebufferSize(global.window_main)
         gl.Viewport(0, 0, display_w, display_h)
 
 
@@ -175,7 +180,7 @@ main :: proc() {
     	}
 
 
-        glfw.SwapBuffers(window_main)
+        glfw.SwapBuffers(global.window_main)
     }
 
     glfw.Terminate()
@@ -187,7 +192,7 @@ create_framebuffer :: proc() {
 
     gl.GenTextures(1, &TEXTURE_SCREEN)
     gl.BindTexture(gl.TEXTURE_2D, TEXTURE_SCREEN)
-    w, h := glfw.GetWindowSize(window_main)
+    w, h := glfw.GetWindowSize(global.window_main)
     gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGB, auto_cast w, auto_cast h, 0, gl.RGB, gl.UNSIGNED_BYTE, nil)
     gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
     gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)

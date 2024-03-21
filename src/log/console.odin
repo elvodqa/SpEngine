@@ -6,6 +6,8 @@ import "core:strings"
 import im "../../odin-imgui"
 import "core:c"
 import "base:runtime"
+import "vendor:glfw"
+import "../global"
 
 
 
@@ -75,10 +77,7 @@ logWindow :: proc(console: ^Console) {
 
         im.PushTextWrapPos()
         for item in console.items {
-            
-
             im.Text(item)
-
         }
 
         im.PopTextWrapPos()
@@ -113,6 +112,8 @@ inputBar :: proc(console: ^Console) {
             temp := strings.clone_to_cstring(strings.trim_right_null(cast(string)console.buffer[:])) or_else panic("Console temp buf error fuuuckk")
             append(&console.items, temp)
             console.scrollToBottom = true
+
+            parse_command(temp)
         }
         reclaimFocus = true
         console.buffer = {}
@@ -155,6 +156,30 @@ menuBar :: proc(console: ^Console) {
 }
 
 
+
+parse_command :: proc(input: cstring) {
+    command := strings.clone_from_cstring(input)
+
+    splited := strings.split(command, " ")
+    inputs : [dynamic]string
+    
+    for split in splited {
+        if split != "" {
+            append(&inputs, split)
+        }
+    }
+
+    if len(inputs) == 1 {
+        if inputs[0] == "clear" {
+            console.items = {}
+        }
+        if inputs[0] == "exit" {
+            glfw.SetWindowShouldClose(global.window_main, true)
+        }
+
+    }
+
+}
 
 
 
