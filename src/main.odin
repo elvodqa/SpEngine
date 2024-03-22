@@ -14,6 +14,7 @@ import im "../odin-imgui"
 import "../odin-imgui/imgui_impl_glfw"
 import "../odin-imgui/imgui_impl_opengl3"
 import "themes"
+import "editor"
 
 // Viewport
 FBO : u32
@@ -23,8 +24,10 @@ TEXTURE_SCREEN : u32
 clearColor : [3]f32 = {203.0/255.0, 105.0/255.0, 50.0/255.0}
 
 
+
 main :: proc() {
     console := log.make_console()
+    script_editor := editor.make_code_editor()
 
     log.init(&console)
     log.trace("Log initialized")
@@ -95,7 +98,7 @@ main :: proc() {
 
     create_framebuffer()
 
-    themes.dark_basic()
+    themes.valve()
 
     for !glfw.WindowShouldClose(global.window_main) {
         glfw.PollEvents()
@@ -158,7 +161,7 @@ main :: proc() {
             im.GetIO().DeltaTime = 1 / 60
 
             im.ColorEdit3("ClearColor", &clearColor)
-            im.Text("average %.3f", 1000.0 / io.Framerate)
+            im.Text("average frame %.3f ms", 1000.0 / io.Framerate)
             im.Text("ms/frame (%.1f FPS)", io.Framerate)
 
             im.Text("Console size: ")
@@ -180,6 +183,7 @@ main :: proc() {
 
         
         log.render_console(&console)
+        editor.render_editor(&script_editor)
 
         im.Render()
     
