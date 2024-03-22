@@ -13,6 +13,7 @@ import "gfx"
 import im "../odin-imgui"
 import "../odin-imgui/imgui_impl_glfw"
 import "../odin-imgui/imgui_impl_opengl3"
+import "themes"
 
 // Viewport
 FBO : u32
@@ -71,7 +72,6 @@ main :: proc() {
 
     glfw.MaximizeWindow(global.window_main)
 
-    // Load imgui_impl_glfw
     im.CHECKVERSION()
     im.CreateContext()
 	defer im.DestroyContext()
@@ -84,6 +84,7 @@ main :: proc() {
 		style := im.GetStyle()
 		style.WindowRounding = 0
 		style.Colors[im.Col.WindowBg].w = 1
+
 	}
 
     im.StyleColorsDark()
@@ -93,6 +94,8 @@ main :: proc() {
     defer imgui_impl_opengl3.Shutdown()
 
     create_framebuffer()
+
+    themes.dark_basic()
 
     for !glfw.WindowShouldClose(global.window_main) {
         glfw.PollEvents()
@@ -116,6 +119,26 @@ main :: proc() {
                 }
                 im.EndMenu()
             }
+            if im.BeginMenu("View") {
+                // themes
+                if im.BeginMenu("Themes") {
+                    if im.MenuItem("Dark") {
+                        themes.dark_basic()
+                    }
+                    if im.MenuItem("Light") {
+                        themes.light_basic()
+                    }
+                    im.Separator()
+                    if im.MenuItem("Valve") {
+                        themes.valve()
+                    }
+
+                    im.EndMenu()
+                }
+
+                im.EndMenu()
+            }
+            
             im.EndMainMenuBar()
         }   
 
